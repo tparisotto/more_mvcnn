@@ -83,6 +83,11 @@ training time use a higher subsampling ratio and increase the learning rate of a
 least an order of magnitude.
 
 ## Demo
+Pre-trained models are available here: 
+
+[entropy_model.h5](https://drive.google.com/file/d/1juaduoziJAoXCGPTfm3J7Q_Aq11sH3ln/view?usp=sharing)  
+[classifier_model.h5](https://drive.google.com/file/d/1ai4ITvLGLkhN2By6wnXPoAkP_gTSazPU/view?usp=sharing)
+
 A demonstration of the classification from a 3D mesh file can be run as following:
 ```
 python multi_view_demo.py --data <off_file> --entropy_model <e_model> --classifier_model <c_model>
