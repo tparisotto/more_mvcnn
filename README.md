@@ -85,5 +85,12 @@ least an order of magnitude.
 ## Demo
 A demonstration of the classification from a 3D mesh file can be run as following:
 ```
-python multi_view_demo.py --data <off_file> --entropy_model ../data/entropy_model.h5 --classifier_model ../data/classifier_model.h5
+python multi_view_demo.py --data <off_file> --entropy_model <e_model> --classifier_model <c_model>
 ```
+Substitute `<off_file>` with an object from the ModelNet10 dataset, `<e_model>` with the
+model trained with `entropy_model.py` and `<c_model>` with the model trained with `single_view_cnn.py`.
+The demo will show the color coded entropy map extracted by the entropy model with 
+black circles marking the selected best-views. Then it will render and plot the images
+corresponding to the selected views. 
+On terminal it will report the extracted views with their view-code [0 - 59] and it will
+show the majority voting for class and pose.
