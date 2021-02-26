@@ -104,7 +104,7 @@ def entropy_plot2():
             image = cv2.normalize(image, image, 0, 255, norm_type=cv2.NORM_MINMAX)
             true_entropies.append(shannon_entropy(image))
 
-    entropy_model = keras.models.load_model('/Users/tommaso/Documents/RUG/ResearchProject/data/entropy_model_v2.h5')
+    entropy_model = keras.models.load_model('/Users/tommaso/Documents/RUG/ResearchProject/data/voxnet-157_val_loss-0.133.h5')
     mesh = open3d.io.read_triangle_mesh(FILENAME)
     mesh.vertices = normalize3d(mesh.vertices)
     mesh.scale(1 / np.max(mesh.get_max_bound() - mesh.get_min_bound()), center=mesh.get_center())
@@ -129,6 +129,8 @@ def entropy_plot2():
 
     fig, ax = plt.subplots(2, 1)
     image = ax[0].imshow(true_entropies, cmap='rainbow')
+    ax[0].set_xlabel("Theta (\u03B8)", fontsize='large')
+    ax[0].set_ylabel("Phi (\u03A6)", fontsize='large')
     ax[0].set_title(f"Original Entropy Map - {label.capitalize()}")
     for i in range(5):
         for j in range(12):
@@ -144,6 +146,8 @@ def entropy_plot2():
     #     ax[0].add_patch(circle)
 
     image = ax[1].imshow(pred_entropies, cmap='rainbow')
+    ax[1].set_xlabel("Theta (\u03B8)", fontsize='large')
+    ax[1].set_ylabel("Phi (\u03A6)", fontsize='large')
     ax[1].set_title(f"Predicted Entropy Map - {label.capitalize()}")
     for i in range(5):
         for j in range(12):
@@ -166,6 +170,7 @@ def entropy_plot2():
     ax[1].set_xticklabels([i * 30 for i in range(12)])
     ax[1].set_yticks([i for i in range(5)])
     ax[1].set_yticklabels([(i + 1) * 30 for i in range(5)])
+    plt.subplots_adjust(hspace=0.5)
     plt.show()
     for im in os.listdir(TMP_DIR):
         os.remove(os.path.join(TMP_DIR, im))
@@ -188,7 +193,7 @@ def entropy_plot(n=111):
             value = entropies[i, j]
             ax[0].annotate(f'{value:.2f}', xy=(j - 0.2, i + 0.1))
 
-    entropy_model = keras.models.load_model('/Users/tommaso/Documents/RUG/ResearchProject/data/entropy_model_v2.h5')
+    entropy_model = keras.models.load_model('/Users/tommaso/Documents/RUG/ResearchProject/data/voxnet-157_val_loss-0.133.h5')
     mesh = open3d.io.read_triangle_mesh(
         f'/Users/tommaso/Documents/RUG/ResearchProject/data/modelnet10/{label}/train/{label}_{objct_index:04}.off')
     mesh.vertices = normalize3d(mesh.vertices)
@@ -340,7 +345,7 @@ def acc_score():
 
 
 def main():
-    acc_score()
+    entropy_plot2()
 
 
 if __name__ == '__main__':
