@@ -90,7 +90,7 @@ Pre-trained models are available here:
 
 A demonstration of the classification from a 3D mesh file can be run as following:
 ```
-python multi_view_demo.py --data <off_file> --entropy_model <e_model> --classifier_model <c_model>
+python demo.py --data <off_file> --entropy_model <e_model> --classifier_model <c_model>
 ```
 Substitute `<off_file>` with an object from the ModelNet10 dataset, `<e_model>` with the
 model trained with `entropy_model.py` and `<c_model>` with the model trained with `single_view_cnn.py`.
