@@ -1,3 +1,12 @@
+"""
+Demonstration of classification and pose estimation of
+a 3D object with entropy estimated multi-views based on depth-views.
+
+--data: 3D object file
+--entropy_model: Keras Model file for entropy estimation
+--classifier_model: Keras Model file for single-view classification
+"""
+
 import os
 import sys
 import argparse
@@ -13,7 +22,7 @@ from skimage.measure import shannon_entropy
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
-parser.add_argument('data')
+parser.add_argument('--data')
 parser.add_argument("--entropy_model")
 parser.add_argument("--classifier_model")
 args = parser.parse_args()
@@ -97,10 +106,10 @@ def classify(off_file, entropy_model, classifier):
     peak_views = sorted(peak_views)
     fig, ax = plt.subplots(1)
     image = ax.imshow(pred_entropies, cmap='rainbow')
-    plt.title("Toilet - Entropy Map")
+    plt.title("Entropy Map")
     ax.set_xlabel("Theta (\u03B8)", fontsize='large')
     ax.set_ylabel("Phi (\u03A6)", fontsize='large')
-    fig.colorbar(image, orientation='horizontal')
+    # fig.colorbar(image, orientation='horizontal')
     for i in range(len(coords)):
         circle = plt.Circle((coords[i][1], coords[i][0]), radius=0.2, color='black')
         ax.add_patch(circle)

@@ -1,6 +1,5 @@
 # Simultaneous Multi-View 3D Object Recognition and Grasp Pose Estimation
-![alt text](entropy_map_toilet.png)
-![alt text](entropy_map_toilet_view.png)
+![alt text](overview.png)
 ## Usage
 ### Data Preprocessing
 Download and unzip the Modelet10 dataset from the official distribution:
