@@ -205,7 +205,7 @@ def main():
     for lab in CLASSES:
         test_files = sorted(os.listdir(os.path.join(BASE_DIR, DATA_PATH, lab, 'test')))
         object_index, labels_true, labels_pred, offset_phi, offset_theta = [], [], [], [], []
-        for x in test_files:
+        for x in tqdm(test_files):
             if '.off' in x:
                 x = os.path.join(BASE_DIR, DATA_PATH, lab, 'test', x)
                 if args.topk:
