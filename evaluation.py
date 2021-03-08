@@ -43,8 +43,6 @@ class ViewData:
     n_voxel = 50
 
 
-# CLASSES = ['bathtub', 'bed', 'chair', 'desk', 'dresser',
-#            'monitor', 'night_stand', 'sofa', 'table', 'toilet']
 CLASSES = ['bed']
 
 idx2rot = {}
