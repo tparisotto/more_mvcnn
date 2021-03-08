@@ -4,6 +4,7 @@ Performs prediction of the model on a test set.
 
 import os
 import sys
+import glob
 import argparse
 import numpy as np
 import open3d
@@ -17,13 +18,15 @@ from tqdm import tqdm
 import tempfile
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data')
+parser.add_argument('--modelnet10')
 parser.add_argument("--entropy_model")
 parser.add_argument("--classifier_model")
 parser.add_argument("--name")
+parser.add_argument("--topk")
+parser.add_argument("--view_dataset")
 args = parser.parse_args()
 BASE_DIR = sys.path[0]
-DATA_PATH = os.path.join(BASE_DIR, args.data)
+DATA_PATH = os.path.join(BASE_DIR, args.modelnet10)
 TIMESTAMP = get_datastamp()
 tmp = tempfile.mkdtemp()
 TMP_DIR = os.path.join(BASE_DIR, tmp)
@@ -126,6 +129,50 @@ def classify(off_file, entropy_model, classifier):
     return labels, pred_views, views
 
 
+def classify_topk(off_file, entropy_model, classifier, k):
+    FILENAME = off_file
+    mesh = open3d.io.read_triangle_mesh(FILENAME)
+    mesh.vertices = normalize3d(mesh.vertices)
+    mesh.scale(1 / np.max(mesh.get_max_bound() - mesh.get_min_bound()), center=mesh.get_center())
+    center = (mesh.get_max_bound() + mesh.get_min_bound()) / 2
+    mesh = mesh.translate((-center[0], -center[1], -center[2]))
+    voxel_grid = open3d.geometry.VoxelGrid.create_from_triangle_mesh_within_bounds(input=mesh,
+                                                                                   voxel_size=1 / 50,
+                                                                                   min_bound=np.array(
+                                                                                       [-0.5, -0.5, -0.5]),
+                                                                                   max_bound=np.array([0.5, 0.5, 0.5]))
+    voxels = voxel_grid.get_voxels()
+    grid_size = 50
+    mask = np.zeros((grid_size, grid_size, grid_size))
+    for vox in voxels:
+        mask[vox.grid_index[0], vox.grid_index[1], vox.grid_index[2]] = 1
+    mask = np.pad(mask, 3, 'constant')
+    mask = np.resize(mask, (1, mask.shape[0], mask.shape[1], mask.shape[2], 1))
+    pred_entropies = entropy_model.predict(mask)
+    topk_views = np.array(pred_entropies).argsort()[-k:][::-1]
+
+    views = []
+    views_images = []
+
+    for viewpoint in sorted(topk_views):
+        name = os.path.split(off_file)[-1].rstrip('.off')
+        view_dir = os.path.join(BASE_DIR, args.view_dataset, 'image')
+        file = glob.glob(os.path.join(view_dir, f"{name}*vc_{viewpoint}.png"))[0]
+        im = plt.imread(file)
+        views_images.append(im)
+        file = os.path.split(file)[-1]
+        phi = int(file.split(".")[0].split("_")[-3])
+        theta = int(file.split(".")[0].split("_")[-5])
+        views.append((theta, phi))
+    views_images = np.array(views_images)
+    results = classifier.predict(views_images)
+    labels = results[0]
+    pred_views = results[1]
+    for im in os.listdir(TMP_DIR):
+        os.remove(os.path.join(TMP_DIR, im))
+    return labels, pred_views, views
+
+
 def most_common(lst):
     return max(set(lst), key=lst.count)
 
@@ -152,7 +199,10 @@ def main():
         for x in tqdm(test_files):
             if '.off' in x:
                 x = os.path.join(BASE_DIR, DATA_PATH, lab, 'test', x)
-                labels, pred_views, views = classify(x, entropy_model, classifier)
+                if args.topk:
+                    labels, pred_views, views = classify_topk(x, entropy_model, classifier, args.topk)
+                else:
+                    labels, pred_views, views = classify(x, entropy_model, classifier)
                 for i in range(len(labels)):
                     cl = vec2lab[np.argmax(labels[i])]
                     pv = idx2rot[int(np.argmax(pred_views[i]))]
