@@ -43,14 +43,15 @@ class ViewData:
     n_voxel = 50
 
 
-CLASSES = ['bathtub', 'bed', 'chair', 'desk', 'dresser',
-           'monitor', 'night_stand', 'sofa', 'table', 'toilet']
+# CLASSES = ['bathtub', 'bed', 'chair', 'desk', 'dresser',
+#            'monitor', 'night_stand', 'sofa', 'table', 'toilet']
+CLASSES = ['bed']
 
 idx2rot = {}
 count = 0
 for _phi in range(30, 151, 30):
     for _theta in range(0, 331, 30):
-        idx2rot[count] = (_theta, _phi)
+        idx2rot[count] = (_phi, _theta)
         count += 1
 
 
@@ -136,6 +137,7 @@ def classify_topk(off_file, entropy_model, classifier, k):
     mesh.scale(1 / np.max(mesh.get_max_bound() - mesh.get_min_bound()), center=mesh.get_center())
     center = (mesh.get_max_bound() + mesh.get_min_bound()) / 2
     mesh = mesh.translate((-center[0], -center[1], -center[2]))
+    # print("[DEBUG] Start voxelization")
     voxel_grid = open3d.geometry.VoxelGrid.create_from_triangle_mesh_within_bounds(input=mesh,
                                                                                    voxel_size=1 / 50,
                                                                                    min_bound=np.array(
@@ -148,23 +150,30 @@ def classify_topk(off_file, entropy_model, classifier, k):
         mask[vox.grid_index[0], vox.grid_index[1], vox.grid_index[2]] = 1
     mask = np.pad(mask, 3, 'constant')
     mask = np.resize(mask, (1, mask.shape[0], mask.shape[1], mask.shape[2], 1))
+    # print("[DEBUG] Start 1st prediction")
     pred_entropies = entropy_model.predict(mask)
+    pred_entropies = np.resize(pred_entropies, 60)
     topk_views = np.array(pred_entropies).argsort()[-k:][::-1]
+
 
     views = []
     views_images = []
 
-    for viewpoint in sorted(topk_views):
+    for viewpoint in topk_views:
         name = os.path.split(off_file)[-1].rstrip('.off')
         view_dir = os.path.join(BASE_DIR, args.view_dataset, 'image')
         file = glob.glob(os.path.join(view_dir, f"{name}*vc_{viewpoint}.png"))[0]
+        # print(f"[DEBUG] vc: {viewpoint}")
         im = plt.imread(file)
         views_images.append(im)
         file = os.path.split(file)[-1]
         phi = int(file.split(".")[0].split("_")[-3])
+        # print(f"[DEBUG] phi: {phi}")
         theta = int(file.split(".")[0].split("_")[-5])
+        # print(f"[DEBUG] theta: {theta}")
         views.append((theta, phi))
     views_images = np.array(views_images)
+    # print("[DEBUG] Start 2nd prediction")
     results = classifier.predict(views_images)
     labels = results[0]
     pred_views = results[1]
@@ -196,17 +205,17 @@ def main():
     for lab in CLASSES:
         test_files = sorted(os.listdir(os.path.join(BASE_DIR, DATA_PATH, lab, 'test')))
         object_index, labels_true, labels_pred, offset_phi, offset_theta = [], [], [], [], []
-        for x in tqdm(test_files):
+        for x in test_files:
             if '.off' in x:
                 x = os.path.join(BASE_DIR, DATA_PATH, lab, 'test', x)
                 if args.topk:
                     labels, pred_views, views = classify_topk(x, entropy_model, classifier, int(args.topk))
                 else:
                     labels, pred_views, views = classify(x, entropy_model, classifier)
-                for i in range(len(labels)):
-                    cl = vec2lab[np.argmax(labels[i])]
-                    pv = idx2rot[int(np.argmax(pred_views[i]))]
-                    tv = views[i]
+                # for i in range(len(labels)):
+                #     cl = vec2lab[np.argmax(labels[i])]
+                #     pv = idx2rot[int(np.argmax(pred_views[i]))]
+                #     tv = views[i]
                 labint = []
                 for el in labels:
                     labint.append(np.argmax(el))
