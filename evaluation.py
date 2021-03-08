@@ -200,7 +200,7 @@ def main():
             if '.off' in x:
                 x = os.path.join(BASE_DIR, DATA_PATH, lab, 'test', x)
                 if args.topk:
-                    labels, pred_views, views = classify_topk(x, entropy_model, classifier, args.topk)
+                    labels, pred_views, views = classify_topk(x, entropy_model, classifier, int(args.topk))
                 else:
                     labels, pred_views, views = classify(x, entropy_model, classifier)
                 for i in range(len(labels)):
