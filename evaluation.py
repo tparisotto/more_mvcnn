@@ -203,7 +203,7 @@ def main():
     FIRST_OBJECT = True
     for lab in CLASSES:
         test_files = sorted(os.listdir(os.path.join(BASE_DIR, DATA_PATH, lab, 'test')))
-        object_index, labels_true, labels_pred, offset_phi, offset_theta = [], [], [], [], []
+        object_index, labels_true, labels_pred, offset_phi, offset_theta, n_views = [], [], [], [], [], []
         for x in tqdm(test_files):
             if '.off' in x:
                 x = os.path.join(BASE_DIR, DATA_PATH, lab, 'test', x)
@@ -233,12 +233,14 @@ def main():
                 labels_pred.append(pred_class)
                 offset_theta.append(offset[0])
                 offset_phi.append(offset[1])
+                n_views.append(len(views))
 
         csv = pd.DataFrame({"true_label": labels_true,
                             "object_index": object_index,
                             "pred_label": labels_pred,
                             "offset_theta": offset_theta,
-                            "offset_phi": offset_phi})
+                            "offset_phi": offset_phi,
+                            "n_views": n_views})
 
         if FIRST_OBJECT:  # Create the main DataFrame and csv, next ones will be appended
             FIRST_OBJECT = False
