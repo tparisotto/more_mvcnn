@@ -111,7 +111,7 @@ Please adequately refer to the papers any time this code is being used. If you d
 
 ```text
 @article{MREE2021,
-  title={MORE: Simultaneous Multi-View 3D Object Recognition and Pose Estimation 	},
+  title={MORE: Simultaneous Multi-View 3D Object Recognition and Pose Estimation},
   author={Parisotto Tommaso and Kasaei, Hamidreza},
   journal={arXiv preprint arXiv:3655085},
   year={2021}
