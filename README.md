@@ -1,5 +1,7 @@
 # Simultaneous Multi-View 3D Object Recognition and Grasp Pose Estimation
 ![alt text](overview.png)
+The 3D object is transformed into a 56×56×56 voxel grid which is the input size for our model. The entropy model uses a branching architecturethat converges into a fully connected layer. The output of the entropy model is a 60-values vector which is reshaped into a 2D entropy map. From the entropymap  a  peak  selection  algorithm  returns  the  coordinates  of  the  local  maxima.  We  extract  the  views  corresponding  to  those  coordinates  and  we  use  them  asinput for as many CNNs. The label and pose predictions are pooled by majority vote, resulting in the final prediction.
+
 ## Usage
 ### Data Preprocessing
 Download and unzip the Modelet10 dataset from the official distribution:
