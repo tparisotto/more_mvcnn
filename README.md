@@ -101,3 +101,19 @@ black circles marking the selected best-views. Then it will render and plot the 
 corresponding to the selected views. 
 On terminal it will report the extracted views with their view-code [0 - 59] and it will
 show the majority voting for class and pose.
+
+## Paper
+Latest version available on [arXiv](https://arxiv.org/)  (March 2021)
+
+![alt text](paper.png)
+
+Please adequately refer to the papers any time this code is being used. If you do publish a paper where MORE helped your research, we encourage you to cite the following paper in your publications:
+
+```text
+@article{MREE2021,
+  title={MORE: Simultaneous Multi-View 3D Object Recognition and Pose Estimation 	},
+  author={Parisotto Tommaso and Kasaei, Hamidreza},
+  journal={arXiv preprint arXiv:3655085},
+  year={2021}
+}
+```
